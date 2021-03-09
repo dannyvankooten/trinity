@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "data.h"
 
 struct Record {
     char date[20];
@@ -11,24 +10,39 @@ struct Record {
     float roi;
 };
 
+char *trim(char *str) {
+    for (size_t i=strlen(str) - 1; str[i] == '\n'; str[i--] = '\0');
+    return str;
+}
+
 int main() {
     // read CSV file
-    FILE *fp;
     char *line = NULL;
     size_t len = 0;
     ssize_t read;
-    fp = fopen("data.csv", "r");
-    if (fp == NULL) {
-        return EXIT_FAILURE;
-    }
+    FILE *fin = fopen("data.csv", "r");
+    if (!fin) return EXIT_FAILURE;
 
-    // skip first line
-    if (getline(&line, &len, fp) == -1) {
+    FILE *fout = fopen("data.h", "w");
+    if (!fout) return EXIT_FAILURE;
+
+    // skip first line (CSV header)
+    if (getline(&line, &len, fin) == -1) {
         exit(EXIT_FAILURE);
     }
 
-    size_t rows_size = 0;
-    while ((read = getline(&line, &len, fp)) != -1) {
+    fputs(
+        "struct Row {\n"
+            "\tchar date[20];\n"
+            "\tfloat price;\n"
+            "\tfloat dividends;\n"
+            "\tfloat cpi;\n"
+            "\tfloat roi;\n"
+        "};\n\n"
+        "struct Row rows[] = {\n", fout);
+
+    size_t row_count = 0;
+    while ((read = getline(&line, &len, fin)) != -1) {
         char *date = strtok(line, ",");
         char *price = strtok(NULL, ",");
         char *dividends = strtok(NULL, ",");
@@ -39,22 +53,15 @@ int main() {
             dividends = "0.00";
         }
 
-        size_t r = rows_size;
-        strcpy(rows[r].date, date);
-        rows[r].price = atof(price);
-        rows[r].dividends = atof(dividends);
-        rows[r].cpi = atof(cpi);
-        rows_size++;
+        trim(cpi);
+        fprintf(fout, "\t{ \"%s\", %s, %s, %s }, \n", date, price, dividends, cpi);
 
-        // stop reading after 50.000 rows
-        if (rows_size >= 50000) {
-            break;
-        }
+        row_count++;
+
     }
-    fclose(fp);
+    fputs("};\n\n", fout);
+    fprintf(fout, "#define row_count %ld\n", row_count);
+    fclose(fin);
+    fclose(fout);
 
-
-    for (size_t i = 0; i < rows_size; i++) {
-        printf("{ \"%s\", %.4f, %.4f, %.4f },\n", rows[i].date, rows[i].price, rows[i].dividends, rows[i].cpi);
-    }
 }
