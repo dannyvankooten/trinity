@@ -1,10 +1,10 @@
 # Trinity CLI
 
-A simple C program to run the Trinity study from your command line.
+A simple C program to run the simulations from the [Trinity study](https://en.wikipedia.org/wiki/Trinity_study) from your command line. 
 
 ### Usage
 
-To (re-)run the Trinity study using an initial capital of $1M, a $40K withdrawal rate, 0.15% yearly fees and a required duration of 30 years, run the following command:
+To run the simulation from the Trinity study using an initial capital of $1M, a $40K withdrawal rate, 0.15% yearly fees and a required duration of 30 years, run the following command:
 
 
 ```sh
