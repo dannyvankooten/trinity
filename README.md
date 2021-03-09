@@ -1,6 +1,6 @@
 # Trinity CLI
 
-A simple C program to run the simulations from the [Trinity study](https://en.wikipedia.org/wiki/Trinity_study) from your command line. 
+A simple C program to run the simulations from the [Trinity study](https://en.wikipedia.org/wiki/Trinity_study) from your command line or from other programming languages through its shared library. 
 
 ### Usage
 
